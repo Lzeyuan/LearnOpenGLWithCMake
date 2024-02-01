@@ -1,8 +1,9 @@
 # CMakePresets和Vcpkg
 
-CMakePresets这个东西前几个项目就有了，现在终于写到他了。
+> 仍然是分而治之
 
 # 1 CMakePresets
+CMakePresets这个东西前几个项目就有了，现在终于写到他了。
 ## 1.1 作用
 还是那句话，转移复杂度，分而治之。
 
@@ -30,8 +31,8 @@ CMakeUserPreset.json 不加入版本控制，配置本地开发环境参数
 
 # 2 Vcpkg
 不依赖cmake版本，因为他是作为工具链传入cmake。
-## 2.1 独立环境
-和python一样，每个项目都可以创建专属的环境安装特定版本的包，不和其它环境冲突。
+## 2.1 vcpkg.json管理独立环境
+和python的conda一样，每个项目都可以创建专属的环境安装特定版本的包，不和其它环境冲突。
 
 [教程：从清单文件安装依赖项](https://learn.microsoft.com/zh-cn/vcpkg/consume/manifest-mode?tabs=msbuild%2Cbuild-MSBuild)
 
@@ -69,7 +70,7 @@ CMakeUserPreset.json 不加入版本控制，配置本地开发环境参数
 
 [平台表达式](https://learn.microsoft.com/zh-cn/vcpkg/reference/vcpkg-json#platform-expression)
 
-很坑，这个选项只是说我要安装这个包，具体安不安装，看CMake配置 [三元组参考](https://learn.microsoft.com/zh-cn/vcpkg/users/triplets)。
+很坑，这个选项意思是：`满足这个条件才安装`，具体安装配置参考：[三元组参考](https://learn.microsoft.com/zh-cn/vcpkg/users/triplets)。
 
 比如：`"platform": "(windows & x64 & static)"`，但是没有配置[
 VCPKG_TARGET_TRIPLET](https://learn.microsoft.com/zh-cn/vcpkg/users/buildsystems/cmake-integration#vcpkg_target_triplet)为`x64-windows-static`他不会安装到项目环境里，因为默认是`x64-windows`。
@@ -79,10 +80,9 @@ VCPKG_TARGET_TRIPLET](https://learn.microsoft.com/zh-cn/vcpkg/users/buildsystems
 ## 2.2 吐槽
 和构建构建工具一样C++没几个工具是用的舒服的。
 
-每个包的大版本会更新，小版本也会有修改，而小版本甚至也会修bug（不改版本号）
+每个库都会有版本号更新，而对于vcpkg，某个版本号下修bug的提交（不改版本号），会视为一次`port-version`记录起来。
 
-而vcpkg就用`port`这概念去表达：小版本会修bug的历史记录。这就导致一个坑，在使用指定版本的时候，比如3.3.9版本下更新了10次，他不会去安装最新的修复bug那一次提交，而是安装第一次发布时的提交，即3.3.9#0，而我想要的是最新的3.3.9#10。
+这就导致一个坑，在使用**指定版本**的时候，比如某个库在3.3.9版本下更新了10次，就是说会有0~9的`port-version`，你指定3.3.9版本，他不会去安装最新的修复bug那一次提交（3.3.9#10），而是安装第一次发布时的提交，即3.3.9#0，而这种情况一般就是想要最新的更新。
 
-那怎么解决呢？查看 `vcpkg安装目录下/version/安装库名开头字母-/安装库名.json`，里面就有对应`port`记录了。
-
-本来是有选项显示的，但是删除了[Remove command x-history](https://github.com/microsoft/vcpkg-tool/pull/689)
+本来是有选项显示某个库某个版本的`port-version`，但是删除了[Remove command x-history](https://github.com/microsoft/vcpkg-tool/pull/689)
+那怎么解决呢？查看 `vcpkg安装目录下/version/安装库名开头字母-/安装库名.json`，里面就有对应`port-version`记录了。
