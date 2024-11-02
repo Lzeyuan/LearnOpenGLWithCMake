@@ -2,28 +2,13 @@
   "version": 3,
   "configurePresets": [
     {
-      "name": "x64-windows-base",
-      "description": "面向具有 Visual Studio 开发环境的 Windows(64 位)。",
+      "name": "base",
       "hidden": true,
-      "generator": "Ninja",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "installDir": "${sourceDir}/out/install/${presetName}",
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      },
       "cacheVariables": {
-        "CMAKE_C_COMPILER": "cl.exe",
-        "CMAKE_CXX_COMPILER": "cl.exe",
-        "CMAKE_POLICY_DEFAULT_CMP0091": "NEW",
-        "VCPKG_TARGET_TRIPLET": "x64-windows-static",
-        "CMAKE_POLICY_DEFAULT_CMP0077": "NEW",
-        "X_VCPKG_APPLOCAL_DEPS_INSTALL": "ON"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
+        "CMAKE_TOOLCHAIN_FILE":"$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_POLICY_DEFAULT_CMP0077": "NEW"
       }
     }
   ]

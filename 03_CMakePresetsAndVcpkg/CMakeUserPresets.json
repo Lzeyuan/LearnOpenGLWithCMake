@@ -2,47 +2,74 @@
   "version": 3,
   "configurePresets": [
     {
-      "name": "x64-vcpkg-base",
-      "displayName": "x64 vcpkg base",
-      "inherits": "x64-windows-base",
-      "hidden": true,
-      "cacheVariables": {
-        "VCPKG_TOOLCHAIN_FILE": "D:\\Development\\Environment\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
-      }
-    },
-    {
-      "name": "x64-vcpkg-debug",
-      "displayName": "x64 vcpkg Debug",
-      "inherits": "x64-vcpkg-base",
+      "name": "windows-x64-debug",
+      "inherits": "base",
+      "description": "面向具有 Visual Studio 开发环境的 Windows(64 位)。",
+      "generator": "Visual Studio 17 2022",
+      "architecture": {
+        "strategy": "set",
+        "value": "x64"
+      },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_POLICY_DEFAULT_CMP0091": "NEW",
+        "X_VCPKG_APPLOCAL_DEPS_INSTALL": "ON",
         "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreadedDebugDLL"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
       }
     },
     {
-      "name": "x64-vcpkg-release",
-      "displayName": "x64 vcpkg Release",
-      "inherits": "x64-vcpkg-base",
+      "name": "windows-x64-release",
+      "inherits": "windows-x64-debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreadedDLL"
       }
-    }
-  ],
-  "buildPresets": [
-    {
-      "name": "debug-vcpkg-build",
-      "displayName": "x64-vcpkg-debug",
-      "configurePreset": "x64-vcpkg-debug",
-      "configuration": "Debug",
-      "verbose": true
     },
     {
-      "name": "release-vcpkg-build",
-      "displayName": "x64-vcpkg-release",
-      "configurePreset": "x64-vcpkg-release",
-      "configuration": "Release",
-      "verbose": true
+      "name": "linux-x64-debug",
+      "inherits": "base",
+      "description": "面向具有 GNU 开发环境的 Linux(64 位)。",
+      "generator": "Ninja",
+      "architecture": {
+        "strategy": "external",
+        "value": "x64"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "linux-x64-release",
+      "inherits": "linux-x64-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
     }
   ]
+  //"buildPresets": [
+  //  {
+  //    "name": "debug-vcpkg-build",
+  //    "displayName": "x64-vcpkg-debug",
+  //    "configurePreset": "x64-vcpkg-debug",
+  //    "configuration": "Debug",
+  //    "verbose": true
+  //  },
+  //  {
+  //    "name": "release-vcpkg-build",
+  //    "displayName": "x64-vcpkg-release",
+  //    "configurePreset": "x64-vcpkg-release",
+  //    "configuration": "Release",
+  //    "verbose": true
+  //  }
+  //]
 }

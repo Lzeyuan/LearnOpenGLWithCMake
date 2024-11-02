@@ -1,22 +1,18 @@
 cmake_minimum_required (VERSION 3.25)
 
-if(VCPKG_TOOLCHAIN_FILE)
-    string(REPLACE "\\" "/" converted_path "${VCPKG_TOOLCHAIN_FILE}")
-	list(APPEND CMAKE_TOOLCHAIN_FILE ${converted_path})
-else()
-    message(FATAL_ERROR "please set vcpkg tool file")
-endif()
+set(CMAKE_TOOLCHAIN_FILE ${VCPKG_TOOLCHAIN_FILE} CACHE STRING "Vcpkg toolchain file")
+set(VCPKG_TARGET_TRIPLET x64-windows)
 
 project(03_CMakePresetsAndVcpkg)
 
+find_package(glfw3 CONFIG REQUIRED)
+message("VCPKG_ROOT = " $ENV{VCPKG_ROOT})
 add_executable(
     ${PROJECT_NAME}
-    main.cpp
+    "src/main.cpp"
 )
 
 add_subdirectory(3rd)
-
-find_package(glfw3 CONFIG REQUIRED)
 
 target_link_libraries(
     ${PROJECT_NAME}

@@ -13,21 +13,32 @@ CMakePresets这个东西前几个项目就有了，现在终于写到他了。
 
 ## 1.2 CMakePresets和CMakeUserPresets
 
+- `CMakeLists.txt`：写死的配置
+- `CMakePreset.json`： 加入版本控制，配置宏之类的参数
 
-CMakePreset.json 加入版本控制，配置宏之类的参数
+- `CMakeUserPreset.json`： 不加入版本控制，配置本地开发环境参数
 
-CMakeUserPreset.json 不加入版本控制，配置本地开发环境参数
+为了演示，这一节项目上传了 `CMakeUserPresets.json` ，记得修改 `CMAKE_TOOLCHAIN_FILE` 。
 
-写死的配置写在`CMakeLists.txt`里，根据情况配置的写在`CMakePresets.json`里，和开发者环境有关的写在`CMakeUserPreset.json`里。
-
-为了演示，这一节项目上传了`CMakeUserPresets.json`，记得修改`VCPKG_TOOLCHAIN_FILE`。
+**VSCode的CMake插件，并不会读取系统环境**，也就是说 `$ENV{VCPKG_ROOT}` 是空值。
 
 **比如：**
-- `CMAKE_POLICY_DEFAULT_CMP0091`这个规则和Windows平台相关的就写在`CMakePresets.json`里
-- 生成目录、安装目录、平台架构等等的配置也写在`CMakePresets.json`里
-- `VCPKG_TOOLCHAIN_FILE`是配置vcpkg `.cmake`的文件路径，应写在`CMakeUserPreset.json`里
+- `CMAKE_POLICY_DEFAULT_CMP0091`这个规则和Windows平台相关的就写在`CMakeUserPresets.json`里
+- 生成目录路径、安装目录路径一般约定熟成写在`CMakePresets.json`里
+- `$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake` vcpkg目录是相对文件路径，写在`CMakePreset.json`里
 
 具体查看文件，都是KV值很好懂。
+
+## 1.3 BuildPresets
+```
+{
+  "name": "debug-vcpkg-build",              构建配置名字
+  "displayName": "x64-vcpkg-debug",         gui选项名字
+  "configurePreset": "x64-vcpkg-debug",     对应上面写的配置
+  "configuration": "Debug",                 和"CMAKE_BUILD_TYPE": "Debug"冲突
+  "verbose": true                           VS下CMake设置verbose无用，要在这里设置
+},
+```
 
 # 2 Vcpkg
 不依赖cmake版本，因为他是作为工具链传入cmake。
@@ -36,11 +47,16 @@ CMakeUserPreset.json 不加入版本控制，配置本地开发环境参数
 
 [教程：从清单文件安装依赖项](https://learn.microsoft.com/zh-cn/vcpkg/consume/manifest-mode?tabs=msbuild%2Cbuild-MSBuild)
 
+- 生成vcpkg.json：`vcpkg new --application`
+
+- 添加库：`vcpkg add port [库]`
+
+- 安装：`vcpkg install`，CMake配置时会自动安装
+
 必须要使用`overrides`才能指定版本号。
 > 不要指定版本号，详见吐槽。
 
-必须添加builtin-baseline，若要添加初始 "builtin-baseline"，请使用 [vcpkg x-update-baseline --add-initial-baseline](https://learn.microsoft.com/zh-cn/vcpkg/commands/update-baseline#add-initial-baseline)。 若要更新清单中的基线，请使用 [vcpkg x-update-baseline](https://learn.microsoft.com/zh-cn/vcpkg/commands/update-baseline)。
-
+`builtin-baseline`，现在在 `vcpkg-configuration.json` 里。
 ```json
 {
   "name": "cmake-learn",
@@ -76,6 +92,7 @@ CMakeUserPreset.json 不加入版本控制，配置本地开发环境参数
 VCPKG_TARGET_TRIPLET](https://learn.microsoft.com/zh-cn/vcpkg/users/buildsystems/cmake-integration#vcpkg_target_triplet)为`x64-windows-static`他不会安装到项目环境里，因为默认是`x64-windows`。
 
 **甚至不写都行**，直接看`VCPKG_TARGET_TRIPLET`设置。
+例如：`set(VCPKG_TARGET_TRIPLET x64-windows)`
 
 ## 2.2 吐槽
 和构建构建工具一样C++没几个工具是用的舒服的。
